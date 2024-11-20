@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Niveles de Aceite</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .banner {
+            background-color: #1E3A5F;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .banner h1 {
+            margin: 0;
+        }
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 20px;
+        }
+        .charts {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px; /* Reduce el espacio entre los gráficos */
+            flex-wrap: nowrap; /* Asegura que estén en una sola línea */
+        }
+   	.chart-container {
+            width: 22%; /* Reduce el ancho para acomodar más gráficos en una fila */
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 10px; /* Reduce el padding interno */
+            text-align: center;
+        }
+        canvas {
+            max-width: 100%;
+        }
+        .valve-status {
+            margin-top: 15px;
+            font-size: 1.2em;
+        }
+        .valve-status img {
+            width: 50px;
+            vertical-align: middle;
+        }
+        .valve-button {
+            margin-top: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #1E3A5F;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #294E75;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <h1>Niveles de Aceite</h1>
+        <p>Control en tiempo real de niveles y estado de válvulas</p>
+    </div>
+
+    <div class="container">
+        <div class="charts">
+            <!-- Gráfico Tanque 1 -->
+            <div class="chart-container">
+                <h2>Tanque 1</h2>
+                <canvas id="tanque1Chart"></canvas>
+                <div class="valve-status">
+                    <span id="tanque1Status">Válvula: Abierta</span>
+                    <img id="tanque1Img" src="https://via.placeholder.com/50x50?text=A" alt="Válvula Abierta">
+                </div>
+                <div class="valve-button">
+                    <button onclick="toggleValve('tanque1')">Cambiar Estado</button>
+                </div>
+            </div>
+
+            <!-- Gráfico Tanque 2 -->
+            <div class="chart-container">
+                <h2>Tanque 2</h2>
+                <canvas id="tanque2Chart"></canvas>
+                <div class="valve-status">
+                    <span id="tanque2Status">Válvula: Cerrada</span>
+                    <img id="tanque2Img" src="https://via.placeholder.com/50x50?text=C" alt="Válvula Cerrada">
+                </div>
+                <div class="valve-button">
+                    <button onclick="toggleValve('tanque2')">Cambiar Estado</button>
+                </div>
+            </div>
+
+            <!-- Gráfico Tanque 3 -->
+            <div class="chart-container">
+                <h2>Tanque 3</h2>
+                <canvas id="tanque3Chart"></canvas>
+                <div class="valve-status">
+                    <span id="tanque3Status">Válvula: Abierta</span>
+                    <img id="tanque3Img" src="https://via.placeholder.com/50x50?text=A" alt="Válvula Abierta">
+                </div>
+                <div class="valve-button">
+                    <button onclick="toggleValve('tanque3')">Cambiar Estado</button>
+                </div>
+            </div>
+
+            <!-- Gráfico Tanque 4 -->
+            <div class="chart-container">
+                <h2>Tanque 4</h2>
+                <canvas id="tanque4Chart"></canvas>
+                <div class="valve-status">
+                    <span id="tanque4Status">Válvula: Abierta</span>
+                    <img id="tanque4Img" src="https://via.placeholder.com/50x50?text=A" alt="Válvula Abierta">
+                </div>
+                <div class="valve-button">
+                    <button onclick="toggleValve('tanque4')">Cambiar Estado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos simulados
+        const data = {
+            tanque1: { nivelActual: 3200, capacidadTotal: 5000, estadoValvula: 'abierta', chart: null },
+            tanque2: { nivelActual: 4000, capacidadTotal: 5000, estadoValvula: 'cerrada', chart: null },
+            tanque3: { nivelActual: 2000, capacidadTotal: 5000, estadoValvula: 'abierta', chart: null },
+            tanque4: { nivelActual: 4500, capacidadTotal: 5000, estadoValvula: 'abierta', chart: null }
+        };
+
+        // Crear gráficos de tipo doughnut
+        function createDoughnutChart(ctxId, tanqueData) {
+            const ctx = document.getElementById(ctxId).getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nivel Actual', 'Capacidad Restante'],
+                    datasets: [{
+                        data: [
+                            tanqueData.nivelActual, 
+                            tanqueData.capacidadTotal - tanqueData.nivelActual
+                        ],
+                        backgroundColor: ['#1E3A5F', '#A9A9A9'],
+                        hoverBackgroundColor: ['#294E75', '#BEBEBE']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const percentage = ((value / tanqueData.capacidadTotal) * 100).toFixed(2);
+                                    return `${context.label}: ${value} L (${percentage}%)`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+            tanqueData.chart = chart;
+        }
+
+        // Cambiar el estado de la válvula
+        function toggleValve(tanque) {
+            const tanqueData = data[tanque];
+            const statusElem = document.getElementById(`${tanque}Status`);
+            const imgElem = document.getElementById(`${tanque}Img`);
+
+            if (tanqueData.estadoValvula === 'abierta') {
+                tanqueData.estadoValvula = 'cerrada';
+                statusElem.innerText = 'Válvula: Cerrada';
+                imgElem.src = "https://via.placeholder.com/50x50?text=C";
+                imgElem.alt = "Válvula Cerrada";
+            } else {
+                tanqueData.estadoValvula = 'abierta';
+                statusElem.innerText = 'Válvula: Abierta';
+                imgElem.src = "https://via.placeholder.com/50x50?text=A";
+                imgElem.alt = "Válvula Abierta";
+            }
+        }
+
+        // Simulación de disminución de nivel
+        function updateLevels() {
+            Object.keys(data).forEach(tanqueKey => {
+                const tanqueData = data[tanqueKey];
+                if (tanqueData.estadoValvula === 'abierta' && tanqueData.nivelActual > 0) {
+                    tanqueData.nivelActual -= 50;
+                    tanqueData.chart.data.datasets[0].data = [
+                        tanqueData.nivelActual, 
+                        tanqueData.capacidadTotal - tanqueData.nivelActual
+                    ];
+                    tanqueData.chart.update();
+                }
+            });
+        }
+
+        // Inicializar gráficos
+        createDoughnutChart('tanque1Chart', data.tanque1);
+        createDoughnutChart('tanque2Chart', data.tanque2);
+        createDoughnutChart('tanque3Chart', data.tanque3);
+        createDoughnutChart('tanque4Chart', data.tanque4);
+
+        // Intervalo para disminuir niveles cada segundo
+        setInterval(updateLevels, 1000);
+    </script>
+</body>
+</html>
