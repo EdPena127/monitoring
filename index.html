@@ -12,15 +12,80 @@
             background-color: #f4f4f4;
             color: #333;
         }
-        .banner {
-            background-color: #1E3A5F;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        .banner h1 {
-            margin: 0;
-        }
+        /* Banner */
+	.banner {
+    	    display: flex;
+   	    justify-content: space-between;
+    	    align-items: center;
+   	    background-color: #1E3A5F;
+   	    color: white;
+   	    padding: 10px 20px;
+	}
+
+	.banner-left h1 {
+   	    margin: 0;
+   	    font-size: 1.5em;
+	}
+
+	.banner-right {
+   	    display: flex;
+  	    gap: 15px;
+	}
+
+	.banner-right .icon {
+   	    cursor: pointer;
+	}
+
+	.banner-right .icon img {
+   	    width: 24px;
+   	    height: 24px;
+	}
+	.menu-container {
+    	    position: relative;
+	}
+
+	.dropdown-menu {
+	    display: none; /* Oculta el menú inicialmente */
+	    position: absolute;
+	    top: 30px; /* Ajusta la posición debajo del ícono */
+	    right: 0;
+	    background-color: #fff;
+	    color: #333;
+	    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	    border-radius: 4px;
+	    list-style: none;
+	    padding: 10px 0;
+	    margin: 0;
+	    z-index: 100;
+	    width: 150px;
+	}
+
+	.dropdown-menu li {
+	    padding: 10px 20px;
+	}
+
+	.dropdown-menu li a {
+	    text-decoration: none;
+	    color: #333;
+	    font-size: 0.9em;
+	}
+
+	.dropdown-menu li:hover {
+	    background-color: #f0f0f0;
+	    cursor: pointer;
+	}
+	/* Leyenda bajo el banner */
+	.header-info {
+    	   text-align: center;
+   	   margin: 20px 0;
+    	   font-size: 1em;
+	}
+
+	.header-info hr {
+       	  width: 50%;
+   	  margin: 10px auto;
+   	  border: 1px solid #ccc;
+	}
         .container {
             max-width: 1400px;
             margin: auto;
@@ -69,9 +134,31 @@
     </style>
 </head>
 <body>
+ <!-- Banner -->
     <div class="banner">
-        <h1>Niveles de Aceite</h1>
-        <p>Control en tiempo real de niveles y estado de válvulas</p>
+        <div class="banner-left">
+            <h1>Productos Alimenticios</h1>
+        </div>
+        <div class="banner-right">
+            <div class="icon" title="Opciones">
+                <img src="assets/menu-icon.png" alt="Menu" />
+		<!-- Menú desplegable -->
+		<ul class="dropdown-menu" id="dropdown-menu">
+                    <li><a href="#">Reportes</a></li>
+                    <li><a href="#">Configuración</a></li>
+                    <li><a href="#">Salir de sesión</a></li>
+                </ul>
+            </div>
+            <div class="icon" title="Usuario">
+                <img src="assets/user-icon.png" alt="Usuario" />
+            </div>
+        </div>
+    </div>
+
+
+ <div class="header-info">
+        <p>Dashboard de monitoreo de niveles de aceite en tanques</p>
+        <hr />
     </div>
 
     <div class="container">
